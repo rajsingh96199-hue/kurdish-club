@@ -544,9 +544,17 @@ function Footer() {
         <a href="#top" aria-label="Instagram">
           <Instagram size={20} />
         </a>
-        <a href="tel:8657466854" aria-label="Phone">
-          <Phone size={20} />
-        </a>
+        <a
+  href={`https://wa.me/${918657466854}?text=${encodeURIComponent(
+    "Hi Kurdish Social Club, I want to place an order."
+  )}`}
+  target="_blank"
+  rel="noreferrer"
+  aria-label="WhatsApp"
+>
+  <Phone size={20} />
+</a>
+
       </div>
     </footer>
   );
