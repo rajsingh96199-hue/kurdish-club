@@ -512,9 +512,7 @@ function ContactSection() {
           </a>
         </div>
       </div>
-      <div className="map-panel" data-reveal>
-        <img src="/images/Landing 2.jpeg" alt="Kurdish Social Club black and gold menu board" />
-      </div>
+      
     </section>
   );
 }
