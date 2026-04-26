@@ -18,8 +18,13 @@ import {
 } from "lucide-react";
 import "./styles.css";
 
-const ORDER_EMAIL = import.meta.env.VITE_ORDER_EMAIL;
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER;
+const ORDER_EMAIL = import.meta.env.VITE_ORDER_EMAIL || "tauredzz@gmail.com";
+const WHATSAPP_NUMBER =
+  import.meta.env.VITE_WHATSAPP_NUMBER || "918657466854";
+
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Hi Kurdish Social Club, I want to place an order."
+)}`;
 
 const menuSections = [
   {
@@ -113,16 +118,19 @@ const menuSections = [
 const featured = [
   {
     title: "Signature Milkshakes",
+    category: "Milkshakes",
     body: "Velvet-smooth pours with whipped peaks, chocolate ribbons and fruit finishes.",
     image: "/images/Al faker 3.jpeg",
   },
   {
     title: "Dessert Lounge Plates",
+    category: "Desserts",
     body: "Fudge, cheesecake, baklava and warm sweets for relaxed tables and late nights.",
     image: "/images/Al faker 2.jpeg",
   },
   {
     title: "Al Fakher Shisha",
+    category: "Al Fakher",
     body: "Fruit-led flavour profiles, glowing coals and a room made for slow conversation.",
     image: "/images/Al faker shisha.jpeg",
   },
@@ -152,6 +160,7 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [confirmation, setConfirmation] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(null);
 
   useReveal();
 
@@ -163,13 +172,16 @@ function App() {
   const addToCart = (name, price, category) => {
     setCart((current) => {
       const existing = current.find((item) => item.name === name);
+
       if (existing) {
         return current.map((item) =>
           item.name === name ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
+
       return [...current, { name, price, category, quantity: 1 }];
     });
+
     setCartOpen(true);
   };
 
@@ -194,10 +206,13 @@ function App() {
   return (
     <>
       <Header cartCount={cartCount} onCart={() => setCartOpen(true)} />
+
       <main>
-        <Hero onOrder={() => document.getElementById("menu").scrollIntoView()} />
+        <Hero
+          onOrder={() => document.getElementById("menu").scrollIntoView()}
+        />
         <MenuSection addToCart={addToCart} />
-        <FeaturedSection />
+        <FeaturedSection setActiveMenu={setActiveMenu} />
         <OrderSection
           cart={cart}
           total={total}
@@ -210,7 +225,9 @@ function App() {
         />
         <ContactSection />
       </main>
+
       <Footer />
+
       <CartDrawer
         open={cartOpen}
         cart={cart}
@@ -219,8 +236,21 @@ function App() {
         changeQuantity={changeQuantity}
         removeItem={removeItem}
       />
+
+      {activeMenu && (
+        <MenuPopup
+          activeMenu={activeMenu}
+          setActiveMenu={setActiveMenu}
+          addToCart={addToCart}
+        />
+      )}
+
       {confirmation && (
-        <div className="toast" role="status" onClick={() => setConfirmation("")}>
+        <div
+          className="toast"
+          role="status"
+          onClick={() => setConfirmation("")}
+        >
           <Sparkles size={18} />
           {confirmation}
         </div>
@@ -232,16 +262,27 @@ function App() {
 function Header({ cartCount, onCart }) {
   return (
     <header className="site-header">
-      <a className="brand-mark" href="#top" aria-label="Kurdish Social Club home">
+      <a
+        className="brand-mark"
+        href="#top"
+        aria-label="Kurdish Social Club home"
+      >
         <span>KSC</span>
       </a>
+
       <nav aria-label="Primary navigation">
         <a href="#menu">Menu</a>
         <a href="#featured">Featured</a>
         <a href="#order">Order</a>
         <a href="#contact">Contact</a>
       </nav>
-      <button className="icon-button cart-button" type="button" onClick={onCart} aria-label="Open cart">
+
+      <button
+        className="icon-button cart-button"
+        type="button"
+        onClick={onCart}
+        aria-label="Open cart"
+      >
         <ShoppingBag size={20} />
         {cartCount > 0 && <span>{cartCount}</span>}
       </button>
@@ -255,22 +296,29 @@ function Hero({ onOrder }) {
       <div className="smoke smoke-one" />
       <div className="smoke smoke-two" />
       <div className="hero-art" aria-hidden="true" />
+
       <div className="hero-content" data-reveal>
         <div className="crest">KSC</div>
         <p className="eyebrow">Luxury lounge cafe</p>
         <h1>Kurdish Social Club</h1>
         <p className="subtitle">Coffee • Tea • Desserts • Shisha</p>
+
         <div className="hero-actions">
           <button className="gold-button" type="button" onClick={onOrder}>
             Order Now
           </button>
+
           <a className="ghost-button" href="#featured">
             Explore Lounge
           </a>
         </div>
       </div>
+
       <div className="hero-card" data-reveal>
-        <img src="/images/Landing 2.jpeg" alt="Kurdish Social Club luxury menu artwork" />
+        <img
+          src="/images/Landing 2.jpeg"
+          alt="Kurdish Social Club luxury menu artwork"
+        />
       </div>
     </section>
   );
@@ -283,16 +331,19 @@ function MenuSection({ addToCart }) {
         <p className="eyebrow">Curated menu</p>
         <h2>Premium lounge favourites</h2>
       </div>
+
       <div className="menu-grid">
         {menuSections.map(({ category, icon: Icon, note, items }) => (
           <article className="menu-card" key={category} data-reveal>
             <div className="menu-card-head">
               <Icon size={28} />
+
               <div>
                 <h3>{category}</h3>
                 <p>{note}</p>
               </div>
             </div>
+
             <div className="menu-items">
               {items.map(([name, price]) => (
                 <div className="menu-item" key={name}>
@@ -300,7 +351,11 @@ function MenuSection({ addToCart }) {
                     <strong>{name}</strong>
                     <span>{formatPrice(price)}</span>
                   </div>
-                  <button type="button" onClick={() => addToCart(name, price, category)}>
+
+                  <button
+                    type="button"
+                    onClick={() => addToCart(name, price, category)}
+                  >
                     Add to Cart
                   </button>
                 </div>
@@ -313,19 +368,31 @@ function MenuSection({ addToCart }) {
   );
 }
 
-function FeaturedSection() {
+function FeaturedSection({ setActiveMenu }) {
   return (
     <section className="section featured-section" id="featured">
       <div className="section-heading" data-reveal>
         <p className="eyebrow">House signatures</p>
         <h2>Milkshakes, desserts and shisha with theatre</h2>
       </div>
+
       <div className="featured-track">
         {featured.map((item) => (
-          <article className="feature-panel" key={item.title} data-reveal>
+          <article
+            className="feature-panel"
+            key={item.title}
+            data-reveal
+            role="button"
+            tabIndex={0}
+            onClick={() => setActiveMenu(item.category)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") setActiveMenu(item.category);
+            }}
+          >
             <img src={item.image} alt={item.title} />
+
             <div>
-              <span>Featured</span>
+              <span>Click to view menu</span>
               <h3>{item.title}</h3>
               <p>{item.body}</p>
             </div>
@@ -333,6 +400,60 @@ function FeaturedSection() {
         ))}
       </div>
     </section>
+  );
+}
+
+function MenuPopup({ activeMenu, setActiveMenu, addToCart }) {
+  const section = menuSections.find((item) => item.category === activeMenu);
+
+  if (!section) return null;
+
+  const Icon = section.icon;
+
+  return (
+    <div
+      className="menu-popup-backdrop"
+      onClick={() => setActiveMenu(null)}
+    >
+      <div className="menu-popup" onClick={(event) => event.stopPropagation()}>
+        <button
+          className="menu-popup-close"
+          type="button"
+          onClick={() => setActiveMenu(null)}
+          aria-label="Close menu"
+        >
+          ×
+        </button>
+
+        <div className="menu-popup-head">
+          <Icon size={34} />
+
+          <div>
+            <p className="eyebrow">Premium Selection</p>
+            <h2>{section.category}</h2>
+            <span>{section.note}</span>
+          </div>
+        </div>
+
+        <div className="popup-menu-items">
+          {section.items.map(([name, price]) => (
+            <div className="popup-menu-item" key={name}>
+              <div>
+                <strong>{name}</strong>
+                <span>{formatPrice(price)}</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => addToCart(name, price, section.category)}
+              >
+                Add to Cart
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -347,23 +468,28 @@ function OrderSection({
   setConfirmation,
 }) {
   const orderDetails = cart
-    .map((item) => `${item.quantity} x ${item.name} - ${formatPrice(item.price * item.quantity)}`)
+    .map(
+      (item) =>
+        `${item.quantity} x ${item.name} - ${formatPrice(
+          item.price * item.quantity
+        )}`
+    )
     .join("\n");
 
   const placeOrder = async (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  if (!cart.length) {
-    return setConfirmation("Please add items to your cart first");
-  }
+    if (!cart.length) {
+      return setConfirmation("Please add items to your cart first");
+    }
 
-  const formData = new FormData(event.currentTarget);
+    const formData = new FormData(event.currentTarget);
 
-  const customerName = formData.get("name");
-  const customerPhone = formData.get("phone");
-  const customerEmail = formData.get("email");
+    const customerName = formData.get("name");
+    const customerPhone = formData.get("phone");
+    const customerEmail = formData.get("email");
 
-  const message = `
+    const message = `
 New Order - Kurdish Social Club
 
 Name: ${customerName}
@@ -376,48 +502,47 @@ ${orderDetails}
 Total: ${formatPrice(total)}
 `;
 
-  const payload = {
-    to_email: ORDER_EMAIL,
-    customer_name: customerName,
-    phone: customerPhone,
-    email: customerEmail,
-    order_details: message,
-    total: formatPrice(total),
-  };
+    const payload = {
+      to_email: ORDER_EMAIL,
+      customer_name: customerName,
+      phone: customerPhone,
+      email: customerEmail,
+      order_details: message,
+      total: formatPrice(total),
+    };
 
-  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-  const whatsappUrl = `https://wa.me/${918657466854}?text=${encodeURIComponent(
-    message
-  )}`;
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+      message
+    )}`;
 
-  setSubmitting(true);
+    setSubmitting(true);
 
-  try {
-    if (serviceId && templateId && publicKey) {
-      await emailjs.send(serviceId, templateId, payload, { publicKey });
-    } else {
-      console.info("EmailJS is not configured. Payload prepared:", payload);
+    try {
+      if (serviceId && templateId && publicKey) {
+        await emailjs.send(serviceId, templateId, payload, { publicKey });
+      } else {
+        console.info("EmailJS is not configured. Payload prepared:", payload);
+      }
+
+      window.open(whatsappUrl, "_blank");
+
+      setConfirmation("Order placed successfully");
+      setCart([]);
+      event.currentTarget.reset();
+    } catch (error) {
+      console.error(error);
+
+      window.open(whatsappUrl, "_blank");
+
+      setConfirmation("Order sent to WhatsApp. Email delivery needs checking.");
+    } finally {
+      setSubmitting(false);
     }
-
-    window.open(whatsappUrl, "_blank");
-
-    setConfirmation("Order placed successfully");
-    setCart([]);
-    event.currentTarget.reset();
-  } catch (error) {
-    console.error(error);
-
-    window.open(whatsappUrl, "_blank");
-
-    setConfirmation("Order sent to WhatsApp. Email delivery needs checking.");
-  } finally {
-    setSubmitting(false);
-  }
-};
-
+  };
 
   return (
     <section className="section order-section" id="order">
@@ -425,25 +550,45 @@ Total: ${formatPrice(total)}
         <p className="eyebrow">Checkout</p>
         <h2>Your private table order</h2>
       </div>
+
       <div className="order-layout" data-reveal>
-        <CartSummary cart={cart} total={total} changeQuantity={changeQuantity} removeItem={removeItem} />
+        <CartSummary
+          cart={cart}
+          total={total}
+          changeQuantity={changeQuantity}
+          removeItem={removeItem}
+        />
+
         <form className="checkout-form" onSubmit={placeOrder}>
           <label>
             Name
             <input name="name" type="text" placeholder="Your name" required />
           </label>
+
           <label>
             Phone Number
             <input name="phone" type="tel" placeholder="8657466854" required />
           </label>
+
           <label>
             Email
-            <input name="email" type="email" placeholder="you@example.com" required />
+            <input
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+            />
           </label>
+
           <label>
             Order Details
-            <textarea name="order" value={orderDetails || "Your selected items will appear here"} readOnly />
+            <textarea
+              name="order"
+              value={orderDetails || "Your selected items will appear here"}
+              readOnly
+            />
           </label>
+
           <button className="gold-button" type="submit" disabled={submitting}>
             {submitting ? "Placing Order..." : "Place Order"}
           </button>
@@ -457,6 +602,7 @@ function CartSummary({ cart, total, changeQuantity, removeItem }) {
   return (
     <aside className="cart-summary">
       <h3>Cart Page</h3>
+
       {cart.length === 0 ? (
         <p className="empty-cart">Your cart is waiting for something excellent.</p>
       ) : (
@@ -467,15 +613,31 @@ function CartSummary({ cart, total, changeQuantity, removeItem }) {
                 <strong>{item.name}</strong>
                 <span>{formatPrice(item.price)} each</span>
               </div>
+
               <div className="quantity-control">
-                <button type="button" aria-label={`Reduce ${item.name}`} onClick={() => changeQuantity(item.name, -1)}>
+                <button
+                  type="button"
+                  aria-label={`Reduce ${item.name}`}
+                  onClick={() => changeQuantity(item.name, -1)}
+                >
                   <Minus size={14} />
                 </button>
+
                 <span>{item.quantity}</span>
-                <button type="button" aria-label={`Increase ${item.name}`} onClick={() => changeQuantity(item.name, 1)}>
+
+                <button
+                  type="button"
+                  aria-label={`Increase ${item.name}`}
+                  onClick={() => changeQuantity(item.name, 1)}
+                >
                   <Plus size={14} />
                 </button>
-                <button type="button" aria-label={`Remove ${item.name}`} onClick={() => removeItem(item.name)}>
+
+                <button
+                  type="button"
+                  aria-label={`Remove ${item.name}`}
+                  onClick={() => removeItem(item.name)}
+                >
                   <Trash2 size={14} />
                 </button>
               </div>
@@ -483,6 +645,7 @@ function CartSummary({ cart, total, changeQuantity, removeItem }) {
           ))}
         </div>
       )}
+
       <div className="cart-total">
         <span>Total</span>
         <strong>{formatPrice(total)}</strong>
@@ -497,22 +660,28 @@ function ContactSection() {
       <div className="contact-content" data-reveal>
         <p className="eyebrow">Visit and connect</p>
         <h2>Reserve the evening mood</h2>
+
         <div className="contact-actions">
-          <a href="tel:8657466854">
+          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
             <Phone size={20} />
-            8657466854
+            WhatsApp
           </a>
+
           <a href={`mailto:${ORDER_EMAIL}`}>
             <Mail size={20} />
-            {ORDER_EMAIL}
+            Email
           </a>
-          <a href="https://maps.google.com/?q=Kurdish%20Social%20Club" target="_blank" rel="noreferrer">
+
+          <a
+            href="https://maps.google.com/?q=Kurdish%20Social%20Club"
+            target="_blank"
+            rel="noreferrer"
+          >
             <MapPin size={20} />
             Map
           </a>
         </div>
       </div>
-      
     </section>
   );
 }
@@ -520,13 +689,28 @@ function ContactSection() {
 function CartDrawer({ open, cart, total, onClose, changeQuantity, removeItem }) {
   return (
     <div className={`drawer-shell ${open ? "open" : ""}`} aria-hidden={!open}>
-      <button className="drawer-backdrop" type="button" onClick={onClose} aria-label="Close cart" />
+      <button
+        className="drawer-backdrop"
+        type="button"
+        onClick={onClose}
+        aria-label="Close cart"
+      />
+
       <aside className="drawer" aria-label="Cart">
         <div className="drawer-head">
           <h2>Your Order</h2>
-          <button type="button" onClick={onClose}>Close</button>
+          <button type="button" onClick={onClose}>
+            Close
+          </button>
         </div>
-        <CartSummary cart={cart} total={total} changeQuantity={changeQuantity} removeItem={removeItem} />
+
+        <CartSummary
+          cart={cart}
+          total={total}
+          changeQuantity={changeQuantity}
+          removeItem={removeItem}
+        />
+
         <a className="gold-button drawer-checkout" href="#order" onClick={onClose}>
           Checkout
         </a>
@@ -540,21 +724,20 @@ function Footer() {
     <footer>
       <div className="footer-brand">Kurdish Social Club</div>
       <p>Good Food, Good Drinks, Good Company</p>
+
       <div className="socials" aria-label="Social links">
         <a href="#top" aria-label="Instagram">
           <Instagram size={20} />
         </a>
-        <a
-  href={`https://wa.me/${918657466854}?text=${encodeURIComponent(
-    "Hi Kurdish Social Club, I want to place an order."
-  )}`}
-  target="_blank"
-  rel="noreferrer"
-  aria-label="WhatsApp"
->
-  <Phone size={20} />
-</a>
 
+        <a
+          href={WHATSAPP_LINK}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="WhatsApp"
+        >
+          <Phone size={20} />
+        </a>
       </div>
     </footer>
   );
