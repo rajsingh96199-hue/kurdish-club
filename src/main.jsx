@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import "./styles.css";
 
-const ORDER_EMAIL = "raj24cs@student.mes.ac.in";
+const ORDER_EMAIL = import.meta.env.VITE_ORDER_EMAIL;
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER;
 
 const menuSections = [
   {
@@ -350,40 +351,73 @@ function OrderSection({
     .join("\n");
 
   const placeOrder = async (event) => {
-    event.preventDefault();
-    if (!cart.length) return setConfirmation("Please add items to your cart first");
+  event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
-    const payload = {
-      to_email: ORDER_EMAIL,
-      customer_name: formData.get("name"),
-      phone: formData.get("phone"),
-      email: formData.get("email"),
-      order_details: `${orderDetails}\n\nTotal: ${formatPrice(total)}`,
-      total: formatPrice(total),
-    };
+  if (!cart.length) {
+    return setConfirmation("Please add items to your cart first");
+  }
 
-    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+  const formData = new FormData(event.currentTarget);
 
-    setSubmitting(true);
-    try {
-      if (serviceId && templateId && publicKey) {
-        await emailjs.send(serviceId, templateId, payload, { publicKey });
-      } else {
-        console.info("EmailJS is not configured. Payload prepared for:", ORDER_EMAIL, payload);
-      }
-      setConfirmation("Order placed successfully");
-      setCart([]);
-      event.currentTarget.reset();
-    } catch (error) {
-      console.error(error);
-      setConfirmation("Order saved, but email delivery needs checking");
-    } finally {
-      setSubmitting(false);
-    }
+  const customerName = formData.get("name");
+  const customerPhone = formData.get("phone");
+  const customerEmail = formData.get("email");
+
+  const message = `
+New Order - Kurdish Social Club
+
+Name: ${customerName}
+Phone: ${customerPhone}
+Email: ${customerEmail}
+
+Order:
+${orderDetails}
+
+Total: ${formatPrice(total)}
+`;
+
+  const payload = {
+    to_email: ORDER_EMAIL,
+    customer_name: customerName,
+    phone: customerPhone,
+    email: customerEmail,
+    order_details: message,
+    total: formatPrice(total),
   };
+
+  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    message
+  )}`;
+
+  setSubmitting(true);
+
+  try {
+    if (serviceId && templateId && publicKey) {
+      await emailjs.send(serviceId, templateId, payload, { publicKey });
+    } else {
+      console.info("EmailJS is not configured. Payload prepared:", payload);
+    }
+
+    window.open(whatsappUrl, "_blank");
+
+    setConfirmation("Order placed successfully");
+    setCart([]);
+    event.currentTarget.reset();
+  } catch (error) {
+    console.error(error);
+
+    window.open(whatsappUrl, "_blank");
+
+    setConfirmation("Order sent to WhatsApp. Email delivery needs checking.");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <section className="section order-section" id="order">
@@ -479,7 +513,7 @@ function ContactSection() {
         </div>
       </div>
       <div className="map-panel" data-reveal>
-        <img src="/" alt="Kurdish Social Club black and gold menu board" />
+        <img src="/images/Landing 2.jpeg" alt="Kurdish Social Club black and gold menu board" />
       </div>
     </section>
   );
