@@ -477,12 +477,19 @@ h1 {
   line-height: 1.55;
 }
 
-.order-layout,
-.contact-section {
+.order-layout {
   display: grid;
   grid-template-columns: 0.95fr 1.05fr;
   gap: 1rem;
   align-items: stretch;
+}
+
+.contact-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 6rem 1rem;
 }
 
 .cart-summary,
