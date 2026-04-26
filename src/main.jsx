@@ -478,7 +478,9 @@ function ContactSection() {
           </a>
         </div>
       </div>
-     
+      <div className="map-panel" data-reveal>
+        <img src="/" alt="Kurdish Social Club black and gold menu board" />
+      </div>
     </section>
   );
 }
