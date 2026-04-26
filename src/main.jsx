@@ -491,6 +491,31 @@ function CartSummary({ cart, total, changeQuantity, removeItem }) {
   );
 }
 
+function ContactSection() {
+  return (
+    <section className="section contact-section" id="contact">
+      <div className="contact-content" data-reveal>
+        <p className="eyebrow">Visit and connect</p>
+        <h2>Reserve the evening mood</h2>
+        <div className="contact-actions">
+          <a href="tel:8657466854">
+            <Phone size={20} />
+            8657466854
+          </a>
+          <a href={`mailto:${ORDER_EMAIL}`}>
+            <Mail size={20} />
+            {ORDER_EMAIL}
+          </a>
+          <a href="https://maps.google.com/?q=Kurdish%20Social%20Club" target="_blank" rel="noreferrer">
+            <MapPin size={20} />
+            Map
+          </a>
+        </div>
+      </div>
+      
+    </section>
+  );
+}
 
 function CartDrawer({ open, cart, total, onClose, changeQuantity, removeItem }) {
   return (
@@ -516,17 +541,12 @@ function Footer() {
       <div className="footer-brand">Kurdish Social Club</div>
       <p>Good Food, Good Drinks, Good Company</p>
       <div className="socials" aria-label="Social links">
-        <a
-  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    "Hi Kurdish Social Club, I want to place an order."
-  )}`}
-  target="_blank"
-  rel="noreferrer"
-  aria-label="WhatsApp"
->
-  <Phone size={20} />
-</a>
-
+        <a href="#top" aria-label="Instagram">
+          <Instagram size={20} />
+        </a>
+        <a href="tel:8657466854" aria-label="Phone">
+          <Phone size={20} />
+        </a>
       </div>
     </footer>
   );
